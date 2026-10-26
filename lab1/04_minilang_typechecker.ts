@@ -106,6 +106,58 @@ for (const [source, expr, wanted] of programs) {
 //     Write  evaluate(e: Expr, sigma: { [variable: string]: number | string | boolean }) .
 //     Use sigma = { x: 10, name: "Ali", age: 20 }. Evaluate programs 1, 2, 4, 7, 9.
 //     Question: your evaluator needs no error handling for  name + 5 . Why not?
+//     ANSWER: evaluate only runs on expressions that check() accepted, and T-Add rejects
+//     string + int, so  name + 5  never reaches the evaluator. The throws below exist
+//     only because TypeScript cannot see that link between check() and evaluate();
+//     for checked programs they are unreachable.
 // S2  New rule. Add  { kind: "eq"; left: Expr; right: Expr }  for  e1 == e2 .
 //     First WRITE the rule as a comment (premises above the line, conclusion below),
 //     then add the case. Should  1 == "1"  be accepted? You are the language designer.
+
+// ---- S1 Evaluator -------------------------------------------------------------------
+type Value = number | string | boolean;
+type Store = { [variable: string]: Value | undefined };   // sigma: names -> values
+
+function evaluate(e: Expr, sigma: Store): Value {
+  switch (e.kind) {
+    case "int":
+    case "str":
+      return e.value;
+
+    case "var": {
+      const val = sigma[e.name];
+      if (val === undefined) throw new Error("unreachable: check() rejects unbound " + e.name);
+      return val;
+    }
+
+    case "add": {
+      const l = evaluate(e.left, sigma);
+      const r = evaluate(e.right, sigma);
+      if (typeof l === "number" && typeof r === "number") return l + r;
+      if (typeof l === "string" && typeof r === "string") return l + r;
+      throw new Error("unreachable: check() rejects " + typeof l + " + " + typeof r);
+    }
+
+    case "gt": {
+      const l = evaluate(e.left, sigma);
+      const r = evaluate(e.right, sigma);
+      if (typeof l === "number" && typeof r === "number") return l > r;
+      throw new Error("unreachable: check() rejects " + typeof l + " > " + typeof r);
+    }
+
+    case "if":
+      return evaluate(e.cond, sigma) === true ? evaluate(e.then, sigma) : evaluate(e.else, sigma);
+  }
+}
+
+// Type-check first. Only accepted expressions are evaluated (programs 1, 2, 4, 7, 9).
+const sigma: Store = { x: 10, name: "Ali", age: 20 };
+for (const [source, expr] of programs) {
+  try {
+    check(expr, gamma);
+  } catch (e) {
+    console.log("EVAL  " + source + "   =>   not evaluated, rejected by check()");
+    continue;
+  }
+  console.log("EVAL  " + source + "   =>   " + JSON.stringify(evaluate(expr, sigma)));
+}
