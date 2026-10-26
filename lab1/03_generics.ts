@@ -26,7 +26,7 @@ function pair<A, B>(x: A, y: B): [A, B] {
 
 // TASK 3 - a constraint. longest accepts anything that has a  length  (string, array, ...)
 // and returns the SAME type it was given.   Hint:  <T extends { length: number }>
-function longest(x: unknown, y: unknown): unknown {
+function longest<T extends { length: number }>(x: T, y: T): T {
   return x.length >= y.length ? x : y;
 }
 
