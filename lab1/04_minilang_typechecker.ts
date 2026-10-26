@@ -41,6 +41,8 @@ function check(e: Expr, env: Env): Type {
       return "bool";
 
     // TASK 1 - T-Str:  a string literal has type string.
+    case "str":                                   // T-Str:  Gamma |- "s" : string
+      return "string";
 
     // TASK 2 - T-Add:  int + int : int      string + string : string
     //                  any other combination: throw new CheckError("...")
