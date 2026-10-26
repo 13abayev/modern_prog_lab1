@@ -15,7 +15,7 @@ const a = first([10, 20]);        // hover over  a
 const b = first(["x", "y"]);      // hover over  b
 
 // TASK 1 - last: like first, for the last element. Make it generic.
-function last(xs: unknown[]): unknown {
+function last<T>(xs: T[]): T | undefined {
   return xs.length > 0 ? xs[xs.length - 1] : undefined;
 }
 
