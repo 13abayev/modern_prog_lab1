@@ -17,7 +17,8 @@ const users = new Map<number, User>([
 // Return the user's name, or "unknown" when there is no such user.
 function userName(id: number): string {
   const u = users.get(id);
-  return u.name;                               // <- fix me
+  if (u === undefined) { return "unknown"; }
+  return u.name;                               // u : User here
 }
 
 // TASK 2 - two layers of absence: the user may be missing AND the email may be null.
