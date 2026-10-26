@@ -20,7 +20,7 @@ function last<T>(xs: T[]): T | undefined {
 }
 
 // TASK 2 - pair: a tuple that remembers BOTH types.   pair(1, "a")  has type  [number, string]
-function pair(x: unknown, y: unknown): unknown[] {
+function pair<A, B>(x: A, y: B): [A, B] {
   return [x, y];
 }
 
