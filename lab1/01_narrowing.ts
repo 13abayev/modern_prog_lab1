@@ -42,9 +42,12 @@ function formatId(id: number | string): string {
 // TASK 4 - PREDICT first: no red underline here. Is the function correct?
 // What does  label(0)  return? Run, then fix it:
 // 0 is a valid quantity, only null means "unknown".
+// ANSWER: label(0) returned "unknown". if (qty) tests truthiness, and 0 is falsy like
+// null, so 0 took the "unknown" path. The compiler was happy because the truthy branch
+// is still a valid number; it checks types, not intent. Test for null explicitly.
 function label(qty: number | null): string {
-  if (qty) { return "qty=" + qty; }
-  return "unknown";
+  if (qty === null) { return "unknown"; }
+  return "qty=" + qty;                         // qty : number here, 0 included
 }
 
 // ---- self-check (do not edit) -------------------------------------------------
