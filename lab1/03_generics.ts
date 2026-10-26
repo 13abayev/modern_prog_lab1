@@ -32,7 +32,7 @@ function longest<T extends { length: number }>(x: T, y: T): T {
 
 // TASK 4 - pluck: read one property from every object. The key must exist, and the
 // result type must follow the key.   Hint:  <T, K extends keyof T>  and the type  T[K]
-function pluck(items: unknown[], key: string): unknown[] {
+function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
   return items.map(item => item[key]);
 }
 
