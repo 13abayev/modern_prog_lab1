@@ -8,6 +8,9 @@
 // ---- PREDICT (1 min): the  any  version. Compile error, run-time error, or fine? ----
 function firstAny(xs: any[]): any { return xs[0]; }
 const oops = () => firstAny([10, 20]).toUpperCase();
+// ANSWER: compiles fine, crashes at run time (toUpperCase is not a function).
+// any  switches checking off: the result of firstAny accepts every method call, so the
+// fact that a number went in (and comes out) is lost. The generic  first  keeps it.
 
 // ---- The generic version from the lecture: the output type follows the input type ----
 function first<T>(xs: T[]): T | undefined { return xs.length > 0 ? xs[0] : undefined; }
