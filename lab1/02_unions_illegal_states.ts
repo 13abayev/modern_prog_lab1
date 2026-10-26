@@ -21,7 +21,9 @@ const nonsense: JobLoose = { status: "queued", accuracy: 0.99, error: "out of me
 //   done    -> accuracy: number           failed  -> error: string
 type Job =
   | { kind: "queued" }
-  | { kind: "running"; progress: number };     // <- add the two missing cases
+  | { kind: "running"; progress: number }
+  | { kind: "done"; accuracy: number }
+  | { kind: "failed"; error: string };
 
 // Compile-time tests. Do not edit them.
 // "@ts-expect-error" means: the NEXT line MUST be a type error.
