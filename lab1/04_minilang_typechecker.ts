@@ -56,6 +56,12 @@ function check(e: Expr, env: Env): Type {
 
     // TASK 3 - T-If:   the condition must be bool, both branches must have the SAME
     //                  type T, and the whole expression has type T.
+    case "if": {                                  // T-If:   c : bool, e1 : T, e2 : T  =>  if c then e1 else e2 : T
+      expectType(check(e.cond, env), "bool", "condition of if");
+      const t = check(e.then, env);
+      expectType(check(e.else, env), t, "else branch of if");
+      return t;
+    }
   }
 }
 
