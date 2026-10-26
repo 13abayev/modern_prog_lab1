@@ -33,7 +33,10 @@ function emailDomain(id: number): string {
 // TASK 3 - typeof narrowing. An id arrives as a number (42) or as a string ("ab-7").
 //   number -> "#0042"  (pad to 4 digits)        string -> "#AB-7"  (upper case)
 function formatId(id: number | string): string {
-  return "#" + id.padStart(4, "0");            // <- fix me
+  if (typeof id === "number") {
+    return "#" + String(id).padStart(4, "0");  // id : number here
+  }
+  return "#" + id.toUpperCase();               // id : string here
 }
 
 // TASK 4 - PREDICT first: no red underline here. Is the function correct?
