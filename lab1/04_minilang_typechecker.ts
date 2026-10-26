@@ -12,7 +12,8 @@ type Expr =
   | { kind: "var"; name: string }                         // x
   | { kind: "add"; left: Expr; right: Expr }              // e1 + e2
   | { kind: "gt"; left: Expr; right: Expr }               // e1 > e2
-  | { kind: "if"; cond: Expr; then: Expr; else: Expr };   // if c then e1 else e2
+  | { kind: "if"; cond: Expr; then: Expr; else: Expr }    // if c then e1 else e2
+  | { kind: "eq"; left: Expr; right: Expr };              // e1 == e2   (stretch S2)
 
 type Type = "int" | "string" | "bool";
 type Env = { [variable: string]: Type | undefined };      // Gamma: names -> types
@@ -62,6 +63,10 @@ function check(e: Expr, env: Env): Type {
       expectType(check(e.else, env), t, "else branch of if");
       return t;
     }
+
+    case "eq":                                    // T-Eq:   T == T : bool   (stretch S2)
+      expectType(check(e.right, env), check(e.left, env), "right of ==");
+      return "bool";
   }
 }
 
@@ -113,6 +118,14 @@ for (const [source, expr, wanted] of programs) {
 // S2  New rule. Add  { kind: "eq"; left: Expr; right: Expr }  for  e1 == e2 .
 //     First WRITE the rule as a comment (premises above the line, conclusion below),
 //     then add the case. Should  1 == "1"  be accepted? You are the language designer.
+//
+//              Gamma |- e1 : T     Gamma |- e2 : T
+//     T-Eq   -------------------------------------
+//                Gamma |- e1 == e2 : bool
+//
+//     ANSWER: no,  1 == "1"  is rejected. Both sides must have the SAME type T, so no rule
+//     applies to int == string. Comparing values of different types is always false (or,
+//     with JavaScript-style coercion, surprising), so it is almost certainly a bug.
 
 // ---- S1 Evaluator -------------------------------------------------------------------
 type Value = number | string | boolean;
@@ -147,6 +160,9 @@ function evaluate(e: Expr, sigma: Store): Value {
 
     case "if":
       return evaluate(e.cond, sigma) === true ? evaluate(e.then, sigma) : evaluate(e.else, sigma);
+
+    case "eq":                                    // same type on both sides, so === is enough
+      return evaluate(e.left, sigma) === evaluate(e.right, sigma);
   }
 }
 
@@ -160,4 +176,22 @@ for (const [source, expr] of programs) {
     continue;
   }
   console.log("EVAL  " + source + "   =>   " + JSON.stringify(evaluate(expr, sigma)));
+}
+
+// ---- S2 Equality --------------------------------------------------------------------
+const eq = (left: Expr, right: Expr): Expr => ({ kind: "eq", left, right });
+const eqPrograms: [string, Expr][] = [
+  ['x == 10', eq(v("x"), int(10))],
+  ['name == "Ali"', eq(v("name"), str("Ali"))],
+  ['(age > 18) == (x > 18)', eq(gt(v("age"), int(18)), gt(v("x"), int(18)))],
+  ['1 == "1"', eq(int(1), str("1"))],
+];
+for (const [source, expr] of eqPrograms) {
+  try {
+    const t = check(expr, gamma);
+    console.log("EQ    " + source + "   =>   " + t + ", evaluates to " + JSON.stringify(evaluate(expr, sigma)));
+  } catch (e) {
+    if (e instanceof CheckError) console.log("EQ    " + source + "   =>   error   (" + e.message + ")");
+    else throw e;
+  }
 }
