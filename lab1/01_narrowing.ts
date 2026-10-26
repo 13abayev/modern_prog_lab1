@@ -25,7 +25,9 @@ function userName(id: number): string {
 // Return the part of the email after "@", or "no email".
 function emailDomain(id: number): string {
   const u = users.get(id);
-  return u.email.split("@")[1];                // <- fix me
+  if (u === undefined) { return "no email"; }  // layer 1: no such user
+  if (u.email === null) { return "no email"; } // layer 2: user without email
+  return u.email.split("@")[1];                // u.email : string here
 }
 
 // TASK 3 - typeof narrowing. An id arrives as a number (42) or as a string ("ab-7").
