@@ -46,6 +46,13 @@ function check(e: Expr, env: Env): Type {
 
     // TASK 2 - T-Add:  int + int : int      string + string : string
     //                  any other combination: throw new CheckError("...")
+    case "add": {                                 // T-Add:  int + int : int,  string + string : string
+      const l = check(e.left, env);
+      const r = check(e.right, env);
+      if (l === "int" && r === "int") return "int";
+      if (l === "string" && r === "string") return "string";
+      throw new CheckError("cannot add " + l + " and " + r);
+    }
 
     // TASK 3 - T-If:   the condition must be bool, both branches must have the SAME
     //                  type T, and the whole expression has type T.
