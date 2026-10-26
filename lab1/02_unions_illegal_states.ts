@@ -45,7 +45,12 @@ function describe(job: Job): string {
   switch (job.kind) {
     case "queued":
       return "waiting";
-    // <- add the other cases
+    case "running":
+      return "running " + Math.round(job.progress * 100) + "%";
+    case "done":
+      return "done, accuracy " + job.accuracy;
+    case "failed":
+      return "FAILED: " + job.error;
   }
 }
 
